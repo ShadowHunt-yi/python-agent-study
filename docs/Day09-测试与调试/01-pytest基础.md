@@ -11,7 +11,9 @@ def test_string():
     assert "hello".upper() == "HELLO"
 
 def test_list():
-    assert [1, 2, 3].reverse() is None  # reverse() 返回 None
+    assert [1, 2, 3].reverse() is None  # ⚠️ reverse() 返回 None！原地修改，不返回新列表
+    # JS: [1,2,3].reverse() → [3,2,1]（返回数组）
+    # Python: [1,2,3].reverse() → None（原地修改，需要先 reverse 再断言原列表）
 
 def test_exception():
     import pytest
@@ -20,7 +22,11 @@ def test_exception():
 
 def test_approx():
     import pytest
-    assert 0.1 + 0.2 == pytest.approx(0.3)
+    # 浮点数精度问题：0.1 + 0.2 = 0.30000000000000004（不是 0.3）
+    # JS: 0.1 + 0.2 === 0.3 → false（同样的问题）
+    # pytest.approx 允许微小误差，默认 rel=1e-6
+    assert 0.1 + 0.2 == pytest.approx(0.3)  # ✅ 通过
+    assert 0.1 + 0.2 == 0.3                  # ❌ 失败
 ```
 
 ```bash
@@ -78,6 +84,10 @@ def session_fixture(): ...
 ```
 
 ### conftest.py —— 共享 Fixture
+
+> conftest.py 是 pytest 的特殊文件，放在项目根目录或测试目录。
+> 其中的 fixture 自动被同级及子目录的所有测试文件发现，无需 import。
+> 类比：相当于自动 import 的公共模块。pytest 通过目录扫描机制发现它。
 
 ```python
 # conftest.py —— 放在项目根目录或测试目录
@@ -148,6 +158,11 @@ async def test_api(async_client):
 ```
 
 ## 五、Mock / Patch
+
+> **⚠️ patch 目标路径的关键规则：必须写函数被导入的地方，不是定义的地方！**
+>
+> 如果 `agent.py` 有 `from openai import AsyncOpenAI`，patch 目标是 `"mini_agent.agent.AsyncOpenAI"`，
+> 不是 `"openai.AsyncOpenAI"`。写错路径 mock 不会生效，但也不会报错——这是最常见的 pytest 陷阱。
 
 ```python
 from unittest.mock import AsyncMock, patch, MagicMock
