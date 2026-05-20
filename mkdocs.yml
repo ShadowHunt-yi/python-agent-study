@@ -1,0 +1,134 @@
+site_name: Python Agent 开发面试速通
+site_description: 10 天从 JS 转 Python Agent 开发的完整学习计划
+site_url: https://yourusername.github.io/python-agent-study/
+repo_url: https://github.com/yourusername/python-agent-study
+repo_name: python-agent-study
+docs_dir: docs
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换到暗色模式
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换到亮色模式
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - tags
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+nav:
+  - 首页: index.md
+  - Day 01 - Python 基础:
+    - Day01-Python基础语法/README.md
+    - 变量与数据类型: Day01-Python基础语法/01-变量与数据类型.md
+    - 控制流: Day01-Python基础语法/02-控制流.md
+    - 函数: Day01-Python基础语法/03-函数.md
+    - 数据结构: Day01-Python基础语法/04-数据结构.md
+    - 字符串格式化: Day01-Python基础语法/05-字符串格式化.md
+    - 推导式: Day01-Python基础语法/06-推导式.md
+    - 错误处理: Day01-Python基础语法/07-错误处理.md
+    - 文件与模块: Day01-Python基础语法/09-文件与模块.md
+    - 数据处理基础: Day01-Python基础语法/10-数据处理基础.md
+    - 练习题: Day01-Python基础语法/08-练习题.md
+  - Day 02 - Python 进阶:
+    - Day02-Python进阶/README.md
+    - 类与面向对象: Day02-Python进阶/01-类与面向对象.md
+    - 模块与导入: Day02-Python进阶/02-模块与导入.md
+    - 文件IO与pathlib: Day02-Python进阶/03-文件IO与pathlib.md
+    - 虚拟环境与包管理: Day02-Python进阶/04-虚拟环境与包管理.md
+    - 装饰器: Day02-Python进阶/05-装饰器.md
+    - 上下文管理器: Day02-Python进阶/06-上下文管理器.md
+    - 生成器与迭代器: Day02-Python进阶/07-生成器与迭代器.md
+    - 异步编程基础: Day02-Python进阶/09-异步编程基础.md
+    - 练习题: Day02-Python进阶/08-练习题.md
+  - Day 03 - Pydantic v2:
+    - Day03-Pydantic/README.md
+    - BaseModel 基础: Day03-Pydantic/01-BaseModel基础.md
+    - 验证器: Day03-Pydantic/02-验证器.md
+    - 高级用法: Day03-Pydantic/04-高级用法.md
+    - 练习题: Day03-Pydantic/03-练习题.md
+  - Day 04 - OpenAI SDK:
+    - Day04-OpenAI-SDK/README.md
+    - 基础调用: Day04-OpenAI-SDK/01-基础调用.md
+    - 高级特性: Day04-OpenAI-SDK/03-高级特性.md
+    - 练习题: Day04-OpenAI-SDK/02-练习题.md
+  - Day 05 - LangChain:
+    - Day05-LangChain基础/README.md
+    - 核心概念: Day05-LangChain基础/01-核心概念.md
+    - LCEL 进阶: Day05-LangChain基础/03-LCEL进阶.md
+    - 练习题: Day05-LangChain基础/02-练习题.md
+  - Day 06 - LangGraph:
+    - Day06-LangGraph/README.md
+    - StateGraph 核心: Day06-LangGraph/01-StateGraph核心.md
+    - 多 Agent 模式: Day06-LangGraph/03-多Agent模式.md
+    - 练习题: Day06-LangGraph/02-练习题.md
+  - Day 07 - FastAPI:
+    - Day07-FastAPI/README.md
+    - 基础路由与请求: Day07-FastAPI/01-基础路由与请求.md
+    - 依赖注入: Day07-FastAPI/02-依赖注入.md
+    - 流式响应与中间件: Day07-FastAPI/03-流式响应与中间件.md
+    - 中间件与 CORS: Day07-FastAPI/05-中间件与CORS.md
+    - 练习题: Day07-FastAPI/04-练习题.md
+  - Day 08 - asyncio:
+    - Day08-asyncio/README.md
+    - 协程与事件循环: Day08-asyncio/01-协程与事件循环.md
+    - 实战模式: Day08-asyncio/03-实战模式.md
+    - 练习题: Day08-asyncio/02-练习题.md
+  - Day 09 - 测试:
+    - Day09-测试与调试/README.md
+    - pytest 基础: Day09-测试与调试/01-pytest基础.md
+    - Agent 测试实战: Day09-测试与调试/03-Agent测试实战.md
+    - 练习题: Day09-测试与调试/02-练习题.md
+  - Day 10 - 综合项目:
+    - Day10-综合项目/README.md
+    - 项目结构: Day10-综合项目/01-项目结构.md
+    - Agent 核心: Day10-综合项目/02-Agent核心.md
+    - 测试: Day10-综合项目/03-测试.md
+    - 部署指南: Day10-综合项目/05-部署指南.md
+    - 总结: Day10-综合项目/04-总结.md
+  - 参考资料:
+    - Python 速查表: resources/Python速查表.md
+    - Agent 架构速查: resources/Agent架构速查.md
+    - 常见面试题: resources/常见面试题.md
+    - 面试场景题: resources/面试场景题.md
+    - 官方文档: resources/官方文档.md

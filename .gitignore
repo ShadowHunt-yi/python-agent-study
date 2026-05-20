@@ -1,0 +1,22 @@
+# MkDocs
+site/
+.venv/
+__pycache__/
+*.pyc
+
+# Python
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
