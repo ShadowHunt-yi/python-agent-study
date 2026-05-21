@@ -511,7 +511,151 @@ async def stream_response(prompt):
 # Agent 场景：边生成边调用工具，不用等整个回复生成完
 ```
 
-## 十二、面试高频问题
+## 十二、现代注意力变体（2023-2026 前沿）
+
+> 参考：Sebastian Raschka [A Visual Guide to Attention Variants in Modern LLMs](https://magazine.sebastianraschka.com/p/visual-attention-variants)（2026.03）
+
+### 为什么需要注意力变体？
+
+```
+标准 MHA 的问题：
+- 每个 head 都有自己的 K/V → KV Cache 内存爆炸
+- 长序列时 O(n^2) 计算量太大
+- 128K/256K/1M 上下文时，推理成本不可接受
+
+解决方向：
+1. 减少 K/V 数量（GQA）
+2. 压缩 K/V 存储（MLA）
+3. 限制注意力范围（SWA、Sparse Attention）
+4. 用更便宜的机制替代部分注意力层（Hybrid）
+```
+
+### GQA（Grouped-Query Attention）
+
+```
+核心思想：多个 Query Head 共享同一组 K/V
+
+MHA（标准）：8 个 Q Head，8 个 K/V Head → 每个 Q 有独立 K/V
+GQA（分组）：8 个 Q Head，2 个 K/V Head → 4 个 Q 共享 1 组 K/V
+MQA（极端）：8 个 Q Head，1 个 K/V Head → 所有 Q 共享 1 组 K/V
+
+KV Cache 节省：
+  MHA: 8 × seq_len × d_head × 2(K+V)
+  GQA: 2 × seq_len × d_head × 2(K+V)  → 节省 75%
+  MQA: 1 × seq_len × d_head × 2(K+V)  → 节省 87.5%
+
+使用 GQA 的模型：
+  Llama 3、Qwen3、Gemma 3、Mistral Small 3.1
+
+为什么 GQA 在 2026 仍是主流？
+- 实现简单，训练稳定
+- 超参调优少
+- 小模型（<100B）效果好
+```
+
+### MLA（Multi-Head Latent Attention）
+
+```
+核心思想：不共享 K/V，而是压缩 K/V 的存储
+
+MHA/GQA：缓存完整的 K 和 V 矩阵
+MLA：缓存一个低维的"潜在表示"（latent），用时再还原为 K/V
+
+类比：
+  GQA = 多人共用一个硬盘（共享）
+  MLA = 把文件压缩后再存（压缩）
+
+优势：
+- 相同内存下，建模质量比 GQA 更好
+- DeepSeek-V2 消融实验：MLA 甚至略优于 MHA
+
+劣势：
+- 实现更复杂
+- 需要额外的压缩/解压计算
+- 小模型（<100B）不如 GQA 好调
+
+使用 MLA 的模型：
+  DeepSeek V3/R1、Kimi K2、GLM-5、Ling 2.5、Mistral Large 3
+```
+
+### SWA（Sliding Window Attention）
+
+```
+核心思想：每个 token 只关注附近的固定窗口，而非全部历史
+
+全局注意力：token 可以看到所有之前的 token → O(n^2)
+滑动窗口：token 只看最近 W 个 token → O(n × W)
+
+Gemma 3 的方案：
+- 5:1 的 local:global 比例（5 层 SWA + 1 层全局注意力）
+- 窗口大小 1024 tokens
+- 消融实验：对性能影响很小
+
+组合使用：SWA + GQA
+  SWA 减少每层的注意力范围
+  GQA 减少每 token 的 KV 缓存大小
+  两者叠加 → 长上下文推理成本大幅降低
+```
+
+### DeepSeek Sparse Attention（DSA）
+
+```
+核心思想：不是固定窗口，而是让模型自己决定关注哪些历史 token
+
+SWA = 固定关注最近 W 个（硬编码局部性）
+DSA = 学习关注最相关的 K 个（动态选择）
+
+机制：
+1. Lightning Indexer：对历史 token 打相关性分数
+2. Token Selector：只保留 top-K 个高分 token
+3. 对选中的 token 做标准 attention
+
+使用 DSA 的模型：DeepSeek V3.2、GLM-5
+通常与 MLA 配合使用：MLA 压缩缓存 + DSA 减少注意力范围
+```
+
+### 现代 LLM 架构对比表
+
+```
+┌──────────────────┬──────────┬──────────┬──────────┬──────────────┐
+│ 模型              │ Attention│ 位置编码  │ FFN 变体  │ 其他特点      │
+├──────────────────┼──────────┼──────────┼──────────┼──────────────┤
+│ GPT-2            │ MHA      │ 可学习    │ GELU     │ 原始 Decoder │
+│ Llama 3          │ GQA      │ RoPE     │ SwiGLU   │ 现代标准      │
+│ DeepSeek V3      │ MLA      │ RoPE     │ SwiGLU+MoE│ 专家混合     │
+│ Gemma 3          │ GQA+SWA  │ RoPE     │ GeGLU    │ 滑动窗口      │
+│ Qwen3.5          │ Hybrid   │ RoPE     │ SwiGLU   │ 线性注意力混合 │
+│ Claude (推测)     │ GQA/MLA  │ RoPE     │ SwiGLU   │ 未公开细节     │
+└──────────────────┴──────────┴──────────┴──────────┴──────────────┘
+
+共同趋势（2025-2026）：
+- RoPE 成为位置编码标准
+- SwiGLU 成为 FFN 标准
+- GQA 或 MLA 替代原始 MHA
+- 长上下文推动 SWA/Sparse/Hybrid 架构
+```
+
+### Hybrid Attention（混合注意力）— 未来趋势
+
+```
+核心思想：大部分层用便宜的线性注意力/状态空间模型，少数层保留标准注意力
+
+Qwen3.5 方案（3:1）：
+  3 层 Gated DeltaNet（线性注意力，O(n) 复杂度）
+  + 1 层 Gated Attention（标准注意力，O(n^2) 但更精确）
+
+为什么 Hybrid 是趋势？
+- 128K+ 上下文时，全注意力太贵
+- 线性注意力做"大致理解"，标准注意力做"精确检索"
+- 混合后内存增长接近线性，而非二次方
+
+其他 Hybrid 方案：
+- Kimi Linear：Gated DeltaNet + Gated MLA
+- Ling 2.5：Lightning Attention + MLA
+- Nemotron：Mamba-2（状态空间模型）+ 稀疏注意力
+```
+
+## 十三、面试高频问题
 
 **Q: Transformer 的 Self-Attention 计算复杂度是多少？**
 A: O(n^2 * d)，n 是序列长度，d 是维度。因为每个 token 都要和所有其他 token 计算注意力。这是长文本处理的主要瓶颈。
@@ -536,3 +680,15 @@ A: RNN 顺序处理，长距离依赖丢失，无法并行。Transformer 用 Sel
 
 **Q: 为什么 Transformer 适合做 Agent 的大脑？**
 A: 理解能力强（Self-Attention 捕捉复杂语义）、支持工具调用（Function Calling 是训练出来的能力）、流式输出（自回归天然支持）、上下文窗口大（可以处理长对话和工具结果）。
+
+**Q: GQA 和 MLA 的区别？**
+A: GQA 通过多个 Query Head 共享同一组 K/V 来减少 KV Cache（共享策略）。MLA 通过压缩 K/V 的存储为低维潜在表示来减少缓存（压缩策略）。GQA 实现简单，小模型效果好；MLA 实现复杂，但大模型（>100B）建模质量更好。Llama 3 用 GQA，DeepSeek V3 用 MLA。
+
+**Q: 什么是 Sliding Window Attention？**
+A: 每个 token 只关注最近的固定窗口（如 1024 tokens），而非全部历史。将 O(n^2) 降为 O(n×W)。Gemma 3 用 5:1 的 local:global 比例，消融实验显示对性能影响很小。通常与 GQA 组合使用。
+
+**Q: 2025-2026 LLM 架构的共同趋势是什么？**
+A: RoPE 成为位置编码标准；SwiGLU 成为 FFN 标准；GQA/MLA 替代原始 MHA；长上下文推动 SWA/Sparse/Hybrid 架构；Hybrid（线性注意力+标准注意力）是未来方向。
+
+**Q: Hybrid Attention 是什么？**
+A: 大部分层用便宜的线性注意力（如 Gated DeltaNet、Mamba-2），少数层保留标准注意力做精确检索。Qwen3.5 用 3:1 比例。优势是长上下文时内存增长接近线性。适合 Agent 场景（需要处理大量工具结果和长对话）。
