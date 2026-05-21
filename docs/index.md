@@ -46,5 +46,6 @@ graph LR
 
 - [Python 速查表](resources/Python速查表.md) — Python vs JS 语法对照
 - [Agent 架构速查](resources/Agent架构速查.md) — Agent 核心组件和模式
-- [常见面试题](resources/常见面试题.md) — 30+ 面试高频问题
+- [Transformer 深入讲解](resources/Transformer深入讲解.md) — Self-Attention、Multi-Head、位置编码、KV Cache
+- [常见面试题](resources/常见面试题.md) — 60+ 面试高频问题
 - [面试场景题](resources/面试场景题.md) — 系统设计 + 手写代码题
