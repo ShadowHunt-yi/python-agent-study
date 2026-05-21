@@ -48,5 +48,6 @@ graph LR
 - [Agent 架构速查](resources/Agent架构速查.md) — Agent 核心组件和模式
 - [Transformer 深入讲解](resources/Transformer深入讲解.md) — Self-Attention、Multi-Head、位置编码、KV Cache
 - [模型微调专题](resources/模型微调专题.md) — LoRA/QLoRA/RLHF/DPO + 踩坑经验
+- [RAG 专题](resources/RAG专题.md) — 向量数据库、Embedding、检索策略、RAG 优化
 - [常见面试题](resources/常见面试题.md) — 60+ 面试高频问题
 - [面试场景题](resources/面试场景题.md) — 系统设计 + 手写代码题

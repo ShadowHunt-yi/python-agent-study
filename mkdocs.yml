@@ -125,10 +125,14 @@ nav:
     - Agent 核心: Day10-综合项目/02-Agent核心.md
     - 测试: Day10-综合项目/03-测试.md
     - 部署指南: Day10-综合项目/05-部署指南.md
+    - 练习题: Day10-综合项目/06-练习题.md
     - 总结: Day10-综合项目/04-总结.md
   - 参考资料:
     - Python 速查表: resources/Python速查表.md
     - Agent 架构速查: resources/Agent架构速查.md
+    - Transformer 深入讲解: resources/Transformer深入讲解.md
+    - 模型微调专题: resources/模型微调专题.md
+    - RAG 专题: resources/RAG专题.md
     - 常见面试题: resources/常见面试题.md
     - 面试场景题: resources/面试场景题.md
     - 官方文档: resources/官方文档.md
